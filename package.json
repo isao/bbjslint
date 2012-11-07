@@ -1,0 +1,23 @@
+{
+  "name": "bbjslint",
+  "version": "0.0.1",
+  "description": "script to run jslint as a bbedit script on frontmost text document",
+  "main": "index.js",
+  "bin": {
+    "bbjslint": "index.js"
+  },
+  "dependencies": {
+    "applescript": ">0.2",
+    "jslint": ">0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/isao/bbjslint.git"
+  },
+  "author": "Isao Yagi",
+  "license": "BSD",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
