@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-/*jslint nomen:true */
+/*jshint node:true */
 'use strict';
 
 var fs = require('fs'),
     exec = require('child_process').exec,
+
+    lint = require('jslint/lib/linter').lint,
     ascr = require('applescript'),
     note = require('terminal-notifier'),
+
     fref = process.env.BB_DOC_PATH,
-    fname = process.env.BB_DOC_NAME,
-    cmd = __dirname + '/node_modules/jslint/bin/jslint.js --terse ' + fref;
+    fname = process.env.BB_DOC_NAME;
 
 
 function logerr(err) {
@@ -17,61 +19,64 @@ function logerr(err) {
     }
 }
 
-function bbitem(fref, line, msg) {
-    return [
-        '{result_kind: "Error"',
-        'result_file: "' + fref + '"',
-        'result_line: ' + line,
-        'message: "' + msg + '"}'
-    ].join();
+function errorObj(results) {
+    var out = [];
+    results.forEach(function (res) {
+        var item = [
+                '{result_kind: "Error"',
+                'result_file: "' + fref + '"',
+                'result_line: ' + res.line,
+                'message: "' + res.reason.replace(/"/g, '\\"') + '"}' //escape
+            ].join();
+        out.push(item);
+    });
+    return '{' + out.join() + '}';
 }
 
-function bbscript(results) {
+function errorScriptStr(listobj, fname) {
     return [
         'tell application "BBEdit"',
-        'set errs to {' + results.join() + '}',
+        'set errs to ' + listobj,
         'make new results browser with data errs with properties {name:"lint"}',
         'end tell'
     ].join('\n');
 }
 
-function parse(lines) {
-    var RE = new RegExp('^.{' + fref.length + '}.(\\d+).:(.+)$'),
-        bblist = [];
-
-    function eachline(line) {
-        var parts = line.match(RE);
-        if (parts) {
-            bblist.push(bbitem(fref, parts[1], parts[2]));
-        }
-    }
-
-    lines.forEach(eachline);
-    ascr.execString(bbscript(bblist), logerr);
-}
-
-function afterExec(err, stdout, stderr) {
+function run(err, str) {
+    var results;
     if (err) {
-        parse(stdout.split('\n'));
-        process.exit(err.code);
+        note("error. couldn't read bbedit document.");
     } else {
-        note('no lint in ' + fname, {title: 'bbedit jslint'});
+        results = lint(str);
+        if (results.ok) {
+            note('no lint in ' + fname, {title: 'bbedit jshint'});
+        } else {
+            ascr.execString(errorScriptStr(errorObj(results.errors)), logerr);
+        }
     }
 }
 
 if (require.main === module) {
-	exec(cmd, afterExec);
+    fs.readFile(fref, 'utf-8', run);
 }
 
 /*
-stdout:
-/Users/isao/Repos/bbjslint/index.js(5):Unexpected dangling '_' in '__dirname'.
-/Users/isao/Repos/bbjslint/index.js(11):Missing 'use strict' statement.
-/Users/isao/Repos/bbjslint/index.js(11):Expected '{' and instead saw 'console'.
-/Users/isao/Repos/bbjslint/index.js(11):Expected 'console' at column 5, not column 14.
-/Users/isao/Repos/bbjslint/index.js(11):Expected ';' and instead saw '}'.
-/Users/isao/Repos/bbjslint/index.js(15):Missing 'use strict' statement.
-/Users/isao/Repos/bbjslint/index.js(16):'parse' was used before it was defined.
-/Users/isao/Repos/bbjslint/index.js(18):Expected '}' at column 9, not column 5.
-/Users/isao/Repos/bbjslint/index.js(19):'notify' was used before it was defined.
+    > var lint = require('jslint/lib/linter').lint
+    undefined
+    > lint("var a")
+    { functions: [],
+      errors:
+       [ { id: '(error)',
+           raw: 'Expected \'{a}\' and instead saw \'{b}\'.',
+           evidence: 'var a',
+           line: 1,
+           character: 6,
+           a: ';',
+           b: '(end)',
+           c: undefined,
+           d: undefined,
+           reason: 'Expected \';\' and instead saw \'(end)\'.' } ],
+      globals: [ 'a' ],
+      ok: false,
+      options: { node: true, es5: true } }
 */
