@@ -3,8 +3,6 @@
 'use strict';
 
 var fs = require('fs'),
-    exec = require('child_process').exec,
-
     lint = require('jslint/lib/linter').lint,
     ascr = require('applescript'),
     note = require('terminal-notifier'),
