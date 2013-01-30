@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 /*jslint nomen:true */
 'use strict';
 
@@ -59,7 +59,9 @@ function afterExec(err, stdout, stderr) {
     }
 }
 
-exec(cmd, afterExec);
+if (require.main === module) {
+	exec(cmd, afterExec);
+}
 
 /*
 stdout:
