@@ -10,7 +10,8 @@ var fs = require('fs'),
     note = require('terminal-notifier'),
 
     fref = process.env.BB_DOC_PATH,
-    fname = process.env.BB_DOC_NAME;
+    fname = process.env.BB_DOC_NAME,
+    TITLE = 'bbedit jslint';
 
 
 function logerr(err) {
@@ -37,7 +38,7 @@ function errorScriptStr(listobj, fname) {
     return [
         'tell application "BBEdit"',
         'set errs to ' + listobj,
-        'make new results browser with data errs with properties {name:"lint"}',
+        'make new results browser with data errs with properties {name:"' + TITLE +'"}',
         'end tell'
     ].join('\n');
 }
@@ -45,11 +46,11 @@ function errorScriptStr(listobj, fname) {
 function run(err, str) {
     var results;
     if (err) {
-        note("error. couldn't read bbedit document.");
+        note("error. couldn't read bbedit document.", {title: TITLE});
     } else {
         results = lint(str);
         if (results.ok) {
-            note('no lint in ' + fname, {title: 'bbedit jshint'});
+            note('no lint in ' + fname, {title: TITLE});
         } else {
             ascr.execString(errorScriptStr(errorObj(results.errors)), logerr);
         }
