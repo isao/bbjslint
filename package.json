@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "applescript": ">0.2",
-    "jslint": ">0.1"
+    "jslint": ">0.1",
+    "terminal-notifier": "~0.1.0"
   },
   "repository": {
     "type": "git",

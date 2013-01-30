@@ -5,6 +5,7 @@
 var fs = require('fs'),
     exec = require('child_process').exec,
     ascr = require('applescript'),
+    note = require('terminal-notifier'),
     fref = process.env.BB_DOC_PATH,
     fname = process.env.BB_DOC_NAME,
     cmd = __dirname + '/node_modules/jslint/bin/jslint.js --terse ' + fref;
@@ -12,12 +13,8 @@ var fs = require('fs'),
 
 function logerr(err) {
     if (err) {
-        console.log(arguments);
+        console.log(err);
     }
-}
-
-function notify(msg, cb) {
-    exec('terminal-notifier -title bbedit -message "' + msg + '"');
 }
 
 function bbitem(fref, line, msg) {
@@ -58,7 +55,7 @@ function afterExec(err, stdout, stderr) {
         parse(stdout.split('\n'));
         process.exit(err.code);
     } else {
-        notify('no lint in ' + fname);
+        note('no lint in ' + fname, {title: 'bbedit jslint'});
     }
 }
 
