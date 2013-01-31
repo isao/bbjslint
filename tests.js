@@ -16,7 +16,7 @@ test('jshint errors are an errror property', function(t) {
     t.plan(1);
     var actual = lint('var no_semicolon'),
         expected = [{
-            id: '(error)',
+           id: '(error)',
            raw: 'Expected \'{a}\' and instead saw \'{b}\'.',
            evidence: 'var no_semicolon',
            line: 1,
