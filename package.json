@@ -1,7 +1,7 @@
 {
   "name": "bbjslint",
   "version": "0.0.2",
-  "description": "script to run jslint as a bbedit script on frontmost text document",
+  "description": "script to run JSHint on frontmost text document in BBEdit.",
   "main": "index.js",
   "bin": "index.js",
   "dependencies": {
