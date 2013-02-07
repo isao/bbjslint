@@ -1,4 +1,4 @@
-BbJsLint
+BbJsLint [![Build Status](https://travis-ci.org/isao/bbjslint.png?branch=develop)](https://travis-ci.org/isao/bbjslint)
 ========
 
 Run [JSLint](http://jslint.com/) on the javascript code in your active [BBEdit](http://barebones.com/products/bbedit/) document, and see the results in a Result Browser window.
